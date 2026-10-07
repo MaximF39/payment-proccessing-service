@@ -5,7 +5,7 @@ pydantic-settings==2.7.1
 sqlalchemy[asyncio]==2.0.36
 asyncpg==0.30.0
 alembic==1.14.1
-faststream[rabbit]==0.5.35
+faststream[cli]==0.5.35
 aio-pika==9.5.4
 httpx==0.28.1
 greenlet==3.1.1
