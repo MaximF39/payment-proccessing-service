@@ -12,7 +12,7 @@ from app.broker import (
     dlq,
     dlx_exchange,
     new_queue,
-    payments_exchange,
+    payments_exchange, DLQ_ROUTING_KEY,
 )
 from app.config import get_settings
 from app.database import SessionLocal, engine
@@ -60,6 +60,12 @@ async def handle_new_payment(event: PaymentEvent, msg: RabbitMessage) -> None:
         if retry_count >= settings.consumer_max_attempts - 1:
             logger.error("Payment %s moved to DLQ after %s attempts", event.payment_id, retry_count + 1)
             await msg.reject(requeue=False)
+            await broker.publish(
+                event.model_dump(mode="json"),
+                exchange=dlx_exchange,
+                routing_key=DLQ_ROUTING_KEY,
+                persist=True,
+            )
             return
         next_attempt = retry_count + 1
         try:
